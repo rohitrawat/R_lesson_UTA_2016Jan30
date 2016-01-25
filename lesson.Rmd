@@ -2,8 +2,13 @@
 title: "Lesson"
 author: "Rohit Rawat"
 date: "January 24, 2016"
-output: html_document
+output: pdf_document
 ---
+
+```{r, echo=FALSE, message=FALSE}
+require('knitr')
+opts_chunk$set(results='hide')
+```
 
 # Outline
 
@@ -23,10 +28,12 @@ Now we will cover:
 - Scope issues in functions, Missing arguments
 - Calling R scripts from the command line
 
-# What are scripts and their use
+# Writing scripts
 
 Just like we learned to use shell commands like `grep`, `sort`, and `wc`, and then later learned how to write shell scripts.
 
+Instead of writing individual statements on the command line like
+
 ```{r}
 dataDir <- 'data'
 dataFile <- 'gapminder-FiveYearData.csv'
@@ -35,6 +42,7 @@ fileName <- file.path(dataDir, dataFile)
 
 ```{r}
 gapminder <- read.csv(fileName)
+View(gapminder)
 ```
 
 ```{r}
@@ -49,32 +57,45 @@ endYear <- max(gapminder$year)
 paste('Data is from years', startYear, 'to', endYear)
 ```
 
-We can paste all of these commands into a single file, maybe for ease in recall, for repetition, or quickly doing something again. R scripts have the extension `.R`.
+We can paste all of these commands into a single file to write a script which is
 
-# Where to write scripts in RStudio
+- for ease in recall
+- repetition
+- properly commented code 
 
-In the default layout...
+R scripts have the extension `.R`.
+
+## Where to write scripts in RStudio
+
+In the default layout, RStudio has a text editor in the upper left corner.
 
 ```{r}
+
+# This script reads the gapminder data and prints the range of years it contains data for.
+
+# read the file
 dataDir <- 'data'
 dataFile <- 'gapminder-FiveYearData.csv'
 fileName <- file.path(dataDir, dataFile)
-
 gapminder <- read.csv(fileName)
 
+# find the minimum and maximum values in the 'year' column of the gapminder data
 startYear <- min(gapminder$year)
-
 endYear <- max(gapminder$year)
 
-paste('Data is from years', startYear, 'to', endYear)
+# Print the result as a message
+print(paste('Data is from years', startYear, 'to', endYear))
+
 ```
 
-Syntax high
-indentation
-var name completion (like bash Tab)
-bracket completion
+## Advantages to using the RStudio editor
 
-# `source`ing a script, setting the working directory, and file paths
+- Syntax highlighting
+- Automatic code indentation
+- Variable name completion with [tab] (like bash)
+- Bracket pairing
+
+# Sourcing a script, setting the working directory, and file paths
 
 Scripts are executed using the `source()` function
 
@@ -82,26 +103,24 @@ Scripts are executed using the `source()` function
 
 You would normally use the `setwd()` command to change the working directory to where the script is stored and then call `source()`.
 
-You can also press the button
-Caveat - script runs but may fail
-
-
-## Exercise
-
-Write and run your own script
-Set x to 25
-Set y to 15
-Calculate the sum and store it in z
-print z
-
-## Absolute vs relative paths
-
-# Writing functions
-
-```{r, echo=FALSE, message=FALSE}
-require('knitr')
-opts_chunk$set(results='hide')
+```{r}
+setwd('~/Dropbox/Carpentry/R_lesson/gapminder')
+source('script.R')
 ```
+
+You can also press the button, which launches your script irrespective of the working directory. Although this may lead to problems if you are sourcing other scripts or loading files using a relative path. You can use the menu option Session -> Set Working Directory -> To source file location to set the current working directory to where your R code is.
+
+## Challenge
+
+Write and run your own script that will
+
+- Set `x` to 25
+- Set `y` to 15
+- Calculate the sum and store it in a variable `z`
+- print `z`
+
+------------------------------------------
+
 # Creating Functions
 
 If we only had one data set to analyze, it would probably be faster to load the file into a spreadsheet and use that to plot some simple statistics. 
@@ -136,25 +155,7 @@ fahr_to_kelvin(32)
 paste('boiling point of water:', fahr_to_kelvin(212))
 ```
 
-We've successfully called the function that we defined, and we have access to the value that we returned. However, it the function was redefined as follows
-
-```{r}
-fahr_to_kelvin <- function(temp) {
-    kelvin <- ((temp - 32) * (5/9)) + 273.15
-}
-```
-
-Now typing
-
-```{r}
-fahr_to_kelvin(32)
-```
-
-Will return nothing.
-
---> In Python lessons, now would come debugging…
-==============================
-
+We've successfully called the function that we defined, and we have access to the value that we returned.
 
 ## Composing Functions
 
@@ -201,61 +202,11 @@ fence('name', '*')
 *name*
 ```
 
-## String splits
-
-If the variable s refers to a string, then we can parse the string into its separate components - each of the characters. Base R has a function called `strsplit` that can be used to break up strings, into smaller chunks. 
-
-```{r}
-pangram <- "the quick brown fox jumps over the lazy dog"
-strsplit(pangram, " ")
-```
-		
-The output from strsplit is in a `list`. 
-Notice that the unusual first line of strsplit()’s output consists of [[1]]. 
-Similar to the way that R displays vectors, [[1]] means that R is showing the first element of a list. 
-Lists are extremely important concepts in R; they allow you to combine all kinds of variables.
-For example, a list can be made up of many elements, and elements could be vectors, dataframes, or matrices. 
-
-In this example, this list has only a single element. Yes, that’s right: The list has one element, but that element is a vector.
-
-To extract an element from a list, you have to use double square brackets. 
-Split your pangram into words, and assign the first element to a new variable called words, using double-square-brackets `[[]]` subsetting, as follows:
-
-```{r}
-words <- strsplit(pangram, " ")[[1]]
-```
-
-We can then pull out the different words using our indexing, where words[1] is the first element in the vector of words and words [9] would be our last:
-
-```{r}
-words[2]
-words[9]
-```
-
-1. Write a function called `out` that returns a string made up of just the first and last characters of its input. a) Outline the steps you need to take to write this function. Discuss with the person sitting next you. b) Write part of the code, make sure it works. c) Write the next step. d) test your function. e) can your function handle words of different lengths?
-
-```{r}
-out <- function(word) {
-    letter  <- strsplit(word, "")[[1]]
-    abbrev  <- paste(letter[1], letter[length(letter)], sep="")
-    abbrev
-}
-
-out('helium')
-```
-
-__Making our function work with different inputs__. If we want just the last word, but we can't remember how long our sentence is, we can use `length()`
-
-```{r}
-length(words)
-words[length(words)]
-```
-
 __BREAK__
 
 ## Explaining the R Environments
 
-Let's take a closer look at what happens when we call `fahr_to_celsius(32)`. To make things clearer, we'll start by putting the initial value 32 in a variable and store the final result in one as well:
+Let's take a closer look at wha+t happens when we call `fahr_to_celsius(32)`. To make things clearer, we'll start by putting the initial value 32 in a variable and store the final result in one as well:
 
 ```{r}
 original <- 32.0
@@ -319,93 +270,6 @@ We don't expect `range` to have the value 20.0 after this function call, so the 
 
 The big idea here is __encapsulation__, and it's the key to writing correct, comprehensible programs. A function's job is to turn several operations into one so that we can think about a single function call instead of a dozen or a hundred statements each time we want to do something. That only works if functions don't interfere with each other; if they do, we have to pay attention to the details once again, which quickly overloads our short-term memory.
 
-### Challenges
-
-1. We previously wrote functions called `fence` and `out`. Walk your neighbor step-by-step through what happens when we call `abbrev <- out(fence('carbon', '+'))`. Use words or a diagram to explain how the variables change, and how the stack/environment changes. Look at the environment tab in RStudio.
-
-__BREAK__
-
-# Testing and Documenting
-
-Once we start putting things in functions so that we can re-use them, we need to start testing that those functions are working correctly. To see how to do this, let's write a function to center a dataset around a particular value:
-	
-```{r}
-center <- function(data, desired){
-	new <- (data - mean(data)) + desired
-	new
-}
-```
-	
-We could test this on our actual data, but since we don't know what the values ought to be, it will be hard to tell if the result was correct. Instead, let's create a matrix of 0's and then center that around 3. This will make it simple to see if our function is working:
-
-```{r}
-z <- matrix(data = 0, nrow = 2, ncol = 2)
-center(z, 3)
-```
-
-That looks right, so let's try center on our real data:
-
-```{r, echo=FALSE}
-datamatrix <- matrix(1:1600, 40, 40)
-```
-```{r}
-center(datamatrix, 0)
-```
-
-It's hard to tell from the default output whether the result is correct, but there are a few simple tests that will reassure us:
-
-```{r}
-paste('original min, mean, and max are:', min(datamatrix), ',', mean(datamatrix), ',', max(datamatrix))
-centered <- center(datamatrix, 0)
-
-paste('centered min, mean, and max are:', min(centered), ',', mean(centered), ',', max(centered))
-```	
-
-That seems almost right: the original mean was about 6.1, so the lower bound from zero is how about -6.1. The mean of the centered data isn't quite zero—we'll explore why not in the challenges—but it's pretty close. We can even go further and check that the standard deviation hasn't changed:
-
-```{r}
-paste('std dev before and after:', sd(datamatrix), sd(centered))
-```
-
-Those values look the same, but we probably wouldn't notice if they were different in the sixth decimal place. Let's do this instead:
-
-```{r}
-paste('difference in standard deviations before and after:', sd(datamatrix) - sd(centered))
-```
-
-Sometimes, a very small difference can be detected. This could be due to rounding at very low decimal places or it could be a version issue if using different releases of R on different computers. It's still possible that our function is wrong, but it seems unlikely enough that we should probably get back to doing our analysis. We have one more task first, though: we should write some documentation for our function to remind ourselves later what it's for and how to use it.
-
-The usual way to put documentation in software is to add comments like this:
-
-```{r}
-#return a new matrix containing the original data centered around the desired value.
-center <- function(data, desired){
-    new <- (data - mean(data)) + desired
-	new
-}
-```
-
-There's a better way, though. If we make our notes outside the function, we may not be able to find them quickly when we need them. If we put the notes inside the funciton, then simply typing in the function will give us the notes along with all of the text, so we can remember what we told the computer to do. In other languages, docstrings show up as help, even for functions that you wrote yourself.
-
-```{r}
-center <- function(data, desired){
-    #return a new matrix containing the original data centered around the desired value.
-    new <- (data - mean(data)) + desired
-	new
-}
-```		
-
-This is better because we can now view our function and our message anytime:
-
-```{r}
-center
-```
-
-### Challenges
-
-This next challenge has several steps. Think about how you break down a difficult problem into manageable pieces.
-
-1. Write a function called `analyze` that takes a filename as a parameter and displays the 3 graphs you made earlier (average, min and max inflammation over time). i.e., `analyze('data/inflammation-01.csv')` should produce the graphs already shown, while `analyze('inflammation-02.csv')` should produce corresponding graphs for the second data set. Be sure to give your function a docstring.
 
 ## Defining Defaults
 
@@ -484,7 +348,31 @@ then the filename is assigned to name (which is what we want), but the delimiter
 
 ### Challenges
 
-Rewrite the normalize function so that it scales data to lie between 0.0 and 1.0 by default, but will allow the caller to specify lower and upper bounds if they want. Compare your implementation to your neighbor's: do the two functions always behave the same way?
+Write a function `getAverageGdpPerCapita` that takes the name of a country, then computes the averaged GDP per capita.
+
+```{r}
+allCountryNames <- levels(gapminder$country)
+unscPermanentMembers <- c('China', 'France', 'Russia', 'United Kingdom', 'United States')
+southAmericanCountries <- c('Argentina', 'Bolivia', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Paraguay', 'Peru', 'Uruguay', 'Venezuela')
+
+getAverageGdpPerCapita <- function(country) {
+  # extract gdpPercap from the gapminder data four the specified country.
+  
+  selectedCountryData <- gapminder[gapminder$country == country, 'gdpPercap']
+  
+  mean(selectedCountryData)
+}
+
+gdpUSA <- getAverageGdpPerCapita('United States')
+gdpCanada <- getAverageGdpPerCapita('Canada')
+gdpMexico <- getAverageGdpPerCapita('Mexico')
+
+averagedGdpUnscPermanentMembers <- sapply(unscPermanentMembers, getAverageGdpPerCapita)
+barplot(averagedGdpUnscPermanentMembers)
+
+print(averagedGdpUnscPermanentMembers)
+```
+
 
 Key Points
 ===============
@@ -500,29 +388,65 @@ Key Points
 * Specify default values for parameters when defining a function using name=value in the parameter list.
 * Parameters can be passed by matching based on name, by position, or by omitting them (in which case the default value is used).
 
-## Next Steps
 
-We now have a function called analyze to visualize a single data set. We could use it to explore all 12 of our current data sets like this:
+------------------------------------------------
 
-```{r, eval=FALSE}
-analyze('data/inflammation-01.csv')
-analyze('data/inflammation-02.csv')
-#...
-analyze('data/inflammation-12.csv')
-```
-
-but the chances of us typing all 12 filenames correctly aren't great, and we'll be even worse off if we get another hundred files. What we need is a way to tell R to do something once for each file, and that will be the subject of the next lesson.
-
-
-# Scope issues in functions, Missing arguments
 # Calling R scripts from the command line
 
-`Rscript filename.R arguments
+Just like we can call other scripts and functions from our R programs, we can call an R script from the command line. We use the Rscript program to do this.
 
-You can also embed plots, for example:
+`Rscript filename.R`
 
-```{r, echo=FALSE}
-plot(cars)
+If Rscript is not on your system's path, you can invoke Rscript using it's full path name.
+
+Try it out:
+
+script.R:
+```
+print('This is a simple R script')
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+On the command line:
+```
+Rscript filename.R
+```
+
+Even if you do your data analysis in a different programming language, you can still use R's plotting capabilities (which we will learn more about in the afternoon session). We will write a script that will produce a barplot from a given datafile. In the previous example, script.R prints a fixed message and has no way of getting any information from the shell. Rscript allows you to send arguments to the R script by specifying them after the file name:
+
+```
+Rscript filename.R argument_1 argument_2 ...
+```
+
+These arguments can be accesed from within the R script by using the `commandArgs()` function. By default the list will include the name of the R executable, the script file name, and several switches. Using `commandArgs(FALSE)` only presents us with the arguments starting from `argument_1` onwards.
+
+Updated script.R
+```
+countyList <- commandArgs(TRUE)
+
+dataDir <- 'data'
+dataFile <- 'gapminder-FiveYearData.csv'
+fileName <- file.path(dataDir, dataFile)
+gapminder <- read.csv(fileName)
+
+getAverageGdpPerCapita <- function(country) {
+  # extract gdpPercap from the gapminder data four the specified country.
+  
+  selectedCountryData <- gapminder[gapminder$country == country, 'gdpPercap']
+  
+  mean(selectedCountryData)
+}
+
+averagedGdp <- sapply(countyList, getAverageGdpPerCapita)
+barplot(averagedGdp)
+
+print(averagedGdp)
+```
+
+We now write a shell script that is going to call this method on a list of countries
+
+```
+countries="Canada Belgium"
+Rscript cmdScript.R $countries
+```
+
+The generated plots are saved in PDF format in the file Rplots.pdf.
