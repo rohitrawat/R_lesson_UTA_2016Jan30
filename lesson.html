@@ -79,96 +79,472 @@ img {
 </ul>
 <p>Now we will cover:</p>
 <ul>
-<li>What are scripts and their use</li>
+<li>Writing R scripts
+<ul>
 <li>Where to write scripts in RStudio</li>
-<li><code>source</code>ing a script, setting the working directory, and file paths</li>
-<li>Writing functions</li>
+<li>Sourcing a script</li>
+</ul></li>
+<li>Writing functions
+<ul>
 <li>Scope issues in functions, Missing arguments</li>
+</ul></li>
 <li>Calling R scripts from the command line</li>
 </ul>
 </div>
-<div id="what-are-scripts-and-their-use" class="section level1">
-<h1>What are scripts and their use</h1>
-<p>Just like we learned to use shell commands like <code>grep</code>, <code>sort</code>, and <code>wc</code>, and then later learned how to write shell scripts.</p>
-<pre class="r"><code>dataDir &lt;- 'data'
-dataFile &lt;- 'gapminder-FiveYearData.csv'
-fileName &lt;- file.path(dataDir, dataFile)</code></pre>
-<pre class="r"><code>gapminder &lt;- read.csv(fileName)</code></pre>
-<pre class="r"><code>startYear &lt;- min(gapminder$year)</code></pre>
-<pre class="r"><code>endYear &lt;- max(gapminder$year)</code></pre>
-<pre class="r"><code>paste('Data is from years', startYear, 'to', endYear)</code></pre>
-<pre><code>## [1] &quot;Data is from years 1952 to 2007&quot;</code></pre>
-<p>We can paste all of these commands into a single file, maybe for ease in recall, for repetition, or quickly doing something again. R scripts have the extension <code>.R</code>.</p>
-</div>
-<div id="where-to-write-scripts-in-rstudio" class="section level1">
-<h1>Where to write scripts in RStudio</h1>
-<p>In the default layout…</p>
-<pre class="r"><code>dataDir &lt;- 'data'
-dataFile &lt;- 'gapminder-FiveYearData.csv'
-fileName &lt;- file.path(dataDir, dataFile)
+<div id="writing-scripts" class="section level1">
+<h1>Writing scripts</h1>
+<p>Just like we learned to use shell commands like <code>grep</code>, <code>sort</code>, and <code>wc</code>, and then later learned how to write shell scripts. A script helps us deal with a bigger or more complicated task. It will consist of a logical sequence of steps needed to solve a problem. That could include</p>
+<ul>
+<li>reading in data</li>
+<li>creating variables to store data</li>
+<li>performing data analysis</li>
+<li>creating more variables to store intermediary and final results</li>
+<li>outputting the results as numbers or plots</li>
+</ul>
+<div id="challenge" class="section level3">
+<h3>Challenge</h3>
+<p>Look at this data:</p>
+<!---
+produced with
+library(knitr)
+kable(head(gapminder,50))
+--->
+<table>
+<thead>
+<tr class="header">
+<th align="left">country</th>
+<th align="right">year</th>
+<th align="right">pop</th>
+<th align="left">continent</th>
+<th align="right">lifeExp</th>
+<th align="right">gdpPercap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">1952</td>
+<td align="right">8425333</td>
+<td align="left">Asia</td>
+<td align="right">28.801</td>
+<td align="right">779.4453</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">1957</td>
+<td align="right">9240934</td>
+<td align="left">Asia</td>
+<td align="right">30.332</td>
+<td align="right">820.8530</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">1962</td>
+<td align="right">10267083</td>
+<td align="left">Asia</td>
+<td align="right">31.997</td>
+<td align="right">853.1007</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">1967</td>
+<td align="right">11537966</td>
+<td align="left">Asia</td>
+<td align="right">34.020</td>
+<td align="right">836.1971</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">1972</td>
+<td align="right">13079460</td>
+<td align="left">Asia</td>
+<td align="right">36.088</td>
+<td align="right">739.9811</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">1977</td>
+<td align="right">14880372</td>
+<td align="left">Asia</td>
+<td align="right">38.438</td>
+<td align="right">786.1134</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">1982</td>
+<td align="right">12881816</td>
+<td align="left">Asia</td>
+<td align="right">39.854</td>
+<td align="right">978.0114</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">1987</td>
+<td align="right">13867957</td>
+<td align="left">Asia</td>
+<td align="right">40.822</td>
+<td align="right">852.3959</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">1992</td>
+<td align="right">16317921</td>
+<td align="left">Asia</td>
+<td align="right">41.674</td>
+<td align="right">649.3414</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">1997</td>
+<td align="right">22227415</td>
+<td align="left">Asia</td>
+<td align="right">41.763</td>
+<td align="right">635.3414</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="right">2002</td>
+<td align="right">25268405</td>
+<td align="left">Asia</td>
+<td align="right">42.129</td>
+<td align="right">726.7341</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="right">2007</td>
+<td align="right">31889923</td>
+<td align="left">Asia</td>
+<td align="right">43.828</td>
+<td align="right">974.5803</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">1952</td>
+<td align="right">1282697</td>
+<td align="left">Europe</td>
+<td align="right">55.230</td>
+<td align="right">1601.0561</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">1957</td>
+<td align="right">1476505</td>
+<td align="left">Europe</td>
+<td align="right">59.280</td>
+<td align="right">1942.2842</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">1962</td>
+<td align="right">1728137</td>
+<td align="left">Europe</td>
+<td align="right">64.820</td>
+<td align="right">2312.8890</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">1967</td>
+<td align="right">1984060</td>
+<td align="left">Europe</td>
+<td align="right">66.220</td>
+<td align="right">2760.1969</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">1972</td>
+<td align="right">2263554</td>
+<td align="left">Europe</td>
+<td align="right">67.690</td>
+<td align="right">3313.4222</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">1977</td>
+<td align="right">2509048</td>
+<td align="left">Europe</td>
+<td align="right">68.930</td>
+<td align="right">3533.0039</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">1982</td>
+<td align="right">2780097</td>
+<td align="left">Europe</td>
+<td align="right">70.420</td>
+<td align="right">3630.8807</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">1987</td>
+<td align="right">3075321</td>
+<td align="left">Europe</td>
+<td align="right">72.000</td>
+<td align="right">3738.9327</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">1992</td>
+<td align="right">3326498</td>
+<td align="left">Europe</td>
+<td align="right">71.581</td>
+<td align="right">2497.4379</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">1997</td>
+<td align="right">3428038</td>
+<td align="left">Europe</td>
+<td align="right">72.950</td>
+<td align="right">3193.0546</td>
+</tr>
+<tr class="odd">
+<td align="left">Albania</td>
+<td align="right">2002</td>
+<td align="right">3508512</td>
+<td align="left">Europe</td>
+<td align="right">75.651</td>
+<td align="right">4604.2117</td>
+</tr>
+<tr class="even">
+<td align="left">Albania</td>
+<td align="right">2007</td>
+<td align="right">3600523</td>
+<td align="left">Europe</td>
+<td align="right">76.423</td>
+<td align="right">5937.0295</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">1952</td>
+<td align="right">9279525</td>
+<td align="left">Africa</td>
+<td align="right">43.077</td>
+<td align="right">2449.0082</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">1957</td>
+<td align="right">10270856</td>
+<td align="left">Africa</td>
+<td align="right">45.685</td>
+<td align="right">3013.9760</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">1962</td>
+<td align="right">11000948</td>
+<td align="left">Africa</td>
+<td align="right">48.303</td>
+<td align="right">2550.8169</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">1967</td>
+<td align="right">12760499</td>
+<td align="left">Africa</td>
+<td align="right">51.407</td>
+<td align="right">3246.9918</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">1972</td>
+<td align="right">14760787</td>
+<td align="left">Africa</td>
+<td align="right">54.518</td>
+<td align="right">4182.6638</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">1977</td>
+<td align="right">17152804</td>
+<td align="left">Africa</td>
+<td align="right">58.014</td>
+<td align="right">4910.4168</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">1982</td>
+<td align="right">20033753</td>
+<td align="left">Africa</td>
+<td align="right">61.368</td>
+<td align="right">5745.1602</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">1987</td>
+<td align="right">23254956</td>
+<td align="left">Africa</td>
+<td align="right">65.799</td>
+<td align="right">5681.3585</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">1992</td>
+<td align="right">26298373</td>
+<td align="left">Africa</td>
+<td align="right">67.744</td>
+<td align="right">5023.2166</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">1997</td>
+<td align="right">29072015</td>
+<td align="left">Africa</td>
+<td align="right">69.152</td>
+<td align="right">4797.2951</td>
+</tr>
+<tr class="odd">
+<td align="left">Algeria</td>
+<td align="right">2002</td>
+<td align="right">31287142</td>
+<td align="left">Africa</td>
+<td align="right">70.994</td>
+<td align="right">5288.0404</td>
+</tr>
+<tr class="even">
+<td align="left">Algeria</td>
+<td align="right">2007</td>
+<td align="right">33333216</td>
+<td align="left">Africa</td>
+<td align="right">72.301</td>
+<td align="right">6223.3675</td>
+</tr>
+</tbody>
+</table>
+<p>All of this data is loaded into a variable called <code>gapminder</code>. Your goal is compute the average life expectancy over all the years of data available for <code>Albania</code>. Think of what other variables you will need to create to store intermediary results and the final result. Also think about the type each variable will have to be (data.frame, vector, scalar, string?). There are many correct answers to this problem.</p>
+<p>You will want to maybe create a subset data.frame with only the rows for Algeria. You would then want to cut out life expectancy column into a vector. You would then compute the mean and store it in a scalar.</p>
+<p>Instead of writing individual statements on the command line, we are going to write our code directly into a script. Scripts are meant to be run in one fell swoop once they are complete. But for new programmers, we will be executing every statement as soon as we type it to look out for errors. In RStudio, we can run the statement under the cursor by pressing the <code>Ctrl-Enter</code> key combination.</p>
+<p>In the default layout, RStudio has a text editor in the upper left corner.</p>
+<p>We start by reading the data. We know the csv file is in the data folder. Recall relative paths from shell. The relative path would be <code>data\gapminder-FiveYearData.csv</code> on a Windows machine and ‘data/gapminder-FiveYearData.csv’ on a *nix machine. To work around this problem, we use the file.path() function which takes two or more path components and generates a valid path:</p>
+<pre class="r"><code># This script computes the average GDP for Albania using the gapminder data
 
+# generate a platform independent file name for the data
+fileName &lt;- file.path('data', 'gapminder-FiveYearData.csv')</code></pre>
+<p>For now, just know that functions are snippets of code that may take some input and do something, maybe returning a result.</p>
+<p>Does the . mean anything? Unlike other languages, in R, it may or or may not mean anything. In this case, the <code>file.</code> prefix is used to group some of the file related functions together.</p>
+<pre><code>## [1] &quot;data/gapminder-FiveYearData.csv&quot;</code></pre>
+<p>We now use the read.csv function to read in the data file</p>
+<pre class="r"><code># read the data file
+gapminder &lt;- read.csv(fileName)</code></pre>
+<p>Let’s take a look at the data.</p>
+<pre><code>View(gapminder)</code></pre>
+<p><code>gapminder$country</code> yeilds the country column from the gapminder data.frame. The statement <code>gapminder$country == 'Albania'</code> produces a logical vector which is TRUE when the country name matches ‘Albania’</p>
+<p>On the console, show:</p>
+<pre><code>gapminder$country == 'Albania'</code></pre>
+<pre class="r"><code># select the rows where the country is Albania and store it in albaniaData
+albaniaData &lt;- gapminder[gapminder$country == 'Albania',]
+
+# select the column containing the GDP per capita from the Albania data
+albaniaGdp &lt;- albaniaData$gdpPercap
+
+# compute the average GDP value
+albaniaAverageGdp &lt;- mean(albaniaGdp)</code></pre>
+<p>Note: These statements can be written in a more compact way if desired.</p>
+<pre class="r"><code>albaniaAverageGdp &lt;- mean(gapminder[gapminder$country == 'Albania', 'gdpPercap'])</code></pre>
+<pre class="r"><code># print a message with the result of our computation
+paste('The average GDP of Albania is', albaniaAverageGdp)</code></pre>
+<pre><code>## [1] &quot;The average GDP of Albania is 3255.36663266667&quot;</code></pre>
+<p>Instead of typing them one by one, we wrote all our commands into a single script.</p>
+<p>The advantages are:</p>
+<ul>
+<li>we have a well commented record of our code</li>
+<li>we can change a value in the beginning of the script and run it again to get the new results</li>
+</ul>
+<p>Advantages of using the RStudio editor</p>
+<ul>
+<li>Syntax highlighting</li>
+<li>Automatic code indentation and bracket pairing</li>
+<li>Variable name completion with [tab] (like bash)</li>
+</ul>
+<p>Our completed script looks like this:</p>
+<p>script.R</p>
+<pre class="r"><code># This script computes the average GDP for Albania using the gapminder data
+
+# generate a platform independent file name for the data
+fileName &lt;- file.path('data', 'gapminder-FiveYearData.csv')
+
+# read the data file
 gapminder &lt;- read.csv(fileName)
 
-startYear &lt;- min(gapminder$year)
+# select the rows where the country is Albania and store it in albaniaData
+albaniaData &lt;- gapminder[gapminder$country == 'Albania',]
 
-endYear &lt;- max(gapminder$year)
+# select the column containing the GDP per capita from the Albania data
+albaniaGdp &lt;- albaniaData$gdpPercap
 
-paste('Data is from years', startYear, 'to', endYear)</code></pre>
-<pre><code>## [1] &quot;Data is from years 1952 to 2007&quot;</code></pre>
-<p>Syntax high indentation var name completion (like bash Tab) bracket completion</p>
-</div>
-<div id="sourceing-a-script-setting-the-working-directory-and-file-paths" class="section level1">
-<h1><code>source</code>ing a script, setting the working directory, and file paths</h1>
-<p>Scripts are executed using the <code>source()</code> function</p>
+# compute the average GDP value
+albaniaAverageGdp &lt;- mean(albaniaGdp)
+
+# print a message with the result of our computation
+paste('The average GDP of Albania is', albaniaAverageGdp)</code></pre>
+<pre><code>## [1] &quot;The average GDP of Albania is 3255.36663266667&quot;</code></pre>
+<p>Now that the script is complete, we can run it as a complete unit. Scripts are executed using the <code>source()</code> function</p>
+<p>script.R:</p>
 <p><code>source(filename)</code></p>
 <p>You would normally use the <code>setwd()</code> command to change the working directory to where the script is stored and then call <code>source()</code>.</p>
-<p>You can also press the button Caveat - script runs but may fail</p>
-<div id="exercise" class="section level2">
-<h2>Exercise</h2>
-<p>Write and run your own script Set x to 25 Set y to 15 Calculate the sum and store it in z print z</p>
+<pre class="r"><code>setwd('~/Dropbox/Carpentry/R_lesson/gapminder')
+source('script.R')</code></pre>
+<pre><code>## [1] &quot;This is script.R&quot;</code></pre>
+<p>You can also press the <code>Source</code> button, which launches your script irrespective of the working directory. Although this may lead to problems if you are sourcing other scripts or loading files using a relative path. You can use the menu option Session -&gt; Set Working Directory -&gt; To source file location to set the current working directory to where your R code is.</p>
 </div>
-<div id="absolute-vs-relative-paths" class="section level2">
-<h2>Absolute vs relative paths</h2>
+<div id="challenge-1" class="section level2">
+<h2>Challenge</h2>
+<p>Write and run your own script that will</p>
+<ul>
+<li>Set <code>x</code> to 25</li>
+<li>Set <code>y</code> to 15</li>
+<li>Calculate the sum and store it in a variable <code>z</code></li>
+<li>print <code>z</code></li>
+</ul>
+<p>To start a new script, open the File menu -&gt; New File -&gt; R script. Save it as myAdder.R and run it.</p>
 </div>
 </div>
-<div id="writing-functions" class="section level1">
-<h1>Writing functions</h1>
+<div id="challenge-2" class="section level1">
+<h1>Challenge</h1>
+<p>We will modify the average GDP script to calculate the maximum GDP value amongst the data for Albania.</p>
+<pre><code># This script computes the maximum GDP for Albania using the gapminder data
+
+# read the data file
+gapminder &lt;- read.csv(fileName)
+
+# select the rows where the country is Albania and store it in albaniaData
+albaniaData &lt;- gapminder[gapminder$country == 'Albania',]
+
+# select the column containing the GDP per capita from the Albania data
+albaniaGdp &lt;- albaniaData$gdpPercap
+
+# compute the maximum GDP value
+
+
+# print a message with the result of our computation
+paste('The maximum GDP of Albania is',   )</code></pre>
+<hr />
 </div>
 <div id="creating-functions" class="section level1">
 <h1>Creating Functions</h1>
-<p>If we only had one data set to analyze, it would probably be faster to load the file into a spreadsheet and use that to plot some simple statistics. But we have twelve files to check, and may have more in future. In this lesson, we’ll learn how to write a function so that we can repeat several operations with a single command.</p>
-<div id="objectives" class="section level2">
-<h2>Objectives</h2>
-<ul>
-<li>Define a function that takes parameters.</li>
-<li>Return a value from a function.</li>
-<li>Test and debug a function.</li>
-<li>Explain what a call stack is, and trace changes to the call stack as functions are called.</li>
-<li>Set default values for function parameters.</li>
-<li>Explain why we should divide programs into small, single-purpose functions.</li>
-<li>Defining a Function</li>
-</ul>
-<p>Let’s start by defining a function <code>fahr_to_kelvin</code> that converts temperatures from Fahrenheit to Kelvin:</p>
-<pre class="r"><code>temp &lt;- NA
-fahr_to_kelvin &lt;- function(temp) {
-    kelvin &lt;- ((temp - 32) * (5/9)) + 273.15
+<p>Functions are “canned scripts” that automate something complicated or convenient or both. Many functions are predefined, or become available when using the function library() (more on that later). A function usually gets one or more inputs called arguments. Functions often (but not always) return a value. A typical example would be the function sqrt(). The input (the argument) must be a number, and the return value (in fact, the output) is the square root of that number. Executing a function (‘running it’) is called calling the function. An example of a function call is:</p>
+<p>b &lt;- sqrt(a)</p>
+<p>Functions gather a sequence of operations into a whole, preserving it for ongoing use. Functions provide:</p>
+<pre><code>- a name we can remember and invoke it by
+- relief from the need to remember the individual operations
+- a defined set of inputs and expected outputs
+- rich connections to the larger programming environment</code></pre>
+<p>Let’s crate a new script, call it functions-lesson.R, and write some examples of our own. Let’s define a function <code>fahr_to_kelvin</code> that converts temperatures from Fahrenheit to Kelvin:</p>
+<pre class="r"><code>fahr_to_kelvin &lt;- function(temp) {
+  kelvin &lt;- ((temp - 32) * (5/9)) + 273.15
     kelvin
 }</code></pre>
 <p>The definition opens with the name of your new function, which is followed by the call to make it a <code>function</code> and a parenthesized list of parameter names. You can have as many input parameters as you would like (but too many might be bad style). The body, or implementation, is surrounded by curly braces <code>{ }</code>. In many languages, the body of the function - the statements that are executed when it runs - must be indented, typically using 4 spaces. While this is not a mandatory requirement in R coding, we strongly recommend you to adopt this as good practice.</p>
-<p>When we call the function, the values we pass to it are assigned to those variables so that we can use them inside the function. The last line within the function is what R will evaluate as a returning value. Remember that the last line has to be a command that will print to the screen, and not an object definition, otherwise the function will return nothing - it will work, but will provide no output. For example, let’s try running our function. Calling our own function is no different from calling any other function:</p>
-<pre class="r"><code>fahr_to_kelvin(32)
-paste('boiling point of water:', fahr_to_kelvin(212))</code></pre>
-<p>We’ve successfully called the function that we defined, and we have access to the value that we returned. However, it the function was redefined as follows</p>
-<pre class="r"><code>fahr_to_kelvin &lt;- function(temp) {
-    kelvin &lt;- ((temp - 32) * (5/9)) + 273.15
-}</code></pre>
-<p>Now typing</p>
+<p>When we call the function, the values we pass to it are assigned to those variables so that we can use them inside the function. The last line within the function is what R will evaluate as a returning value. For example, let’s try running our function. Calling our own function is no different from calling any other function:</p>
 <pre class="r"><code>fahr_to_kelvin(32)</code></pre>
-<p>Will return nothing.</p>
-</div>
-</div>
-<div id="in-python-lessons-now-would-come-debugging" class="section level1">
-<h1>–&gt; In Python lessons, now would come debugging…</h1>
+<pre><code>## [1] 273.15</code></pre>
+<pre class="r"><code>paste('boiling point of water:', fahr_to_kelvin(212))</code></pre>
+<pre><code>## [1] &quot;boiling point of water: 373.15&quot;</code></pre>
+<p>We’ve successfully called the function that we defined, and we have access to the value that we returned.</p>
+<pre class="r"><code>fahr_to_kelvin &lt;- function(temp) {
+  kelvin &lt;- ((temp - 32) * (5/9)) + 273.15
+    kelvin
+}</code></pre>
 <div id="composing-functions" class="section level2">
 <h2>Composing Functions</h2>
 <p>Now that we’ve seen how to turn Fahrenheit into Kelvin, it’s easy to turn Kelvin into Celsius:</p>
@@ -178,6 +554,7 @@ paste('boiling point of water:', fahr_to_kelvin(212))</code></pre>
 }
 
 paste('absolute zero in Celsius:', kelvin_to_celsius(0))</code></pre>
+<pre><code>## [1] &quot;absolute zero in Celsius: -273.15&quot;</code></pre>
 <p>What about converting Fahrenheit to Celsius? We could write out the formula, but we don’t need to. Instead, we can compose the two functions we have already created:</p>
 <pre class="r"><code>fahr_to_celsius &lt;- function(temp) {
     temp_k &lt;- fahr_to_kelvin(temp)
@@ -186,6 +563,7 @@ paste('absolute zero in Celsius:', kelvin_to_celsius(0))</code></pre>
 }
 
 paste('freezing point of water in Celsius:', fahr_to_celsius(32.0))</code></pre>
+<pre><code>## [1] &quot;freezing point of water in Celsius: 0&quot;</code></pre>
 <p>This is our first taste of how larger programs are built: we define basic operations, then combine them in ever-large chunks to get the effect we want. Real-life functions will usually be larger than the ones shown here—typically half a dozen to a few dozen lines—but they shouldn’t ever be much longer than that, or the next person who reads it won’t be able to understand what’s going on. <strong>Modular programming</strong></p>
 <div id="challenges" class="section level3">
 <h3>Challenges</h3>
@@ -195,163 +573,174 @@ paste('freezing point of water in Celsius:', fahr_to_celsius(32.0))</code></pre>
 </ol>
 <pre><code>fence('name', '*')
 *name*</code></pre>
-</div>
-</div>
-<div id="string-splits" class="section level2">
-<h2>String splits</h2>
-<p>If the variable s refers to a string, then we can parse the string into its separate components - each of the characters. Base R has a function called <code>strsplit</code> that can be used to break up strings, into smaller chunks.</p>
-<pre class="r"><code>pangram &lt;- &quot;the quick brown fox jumps over the lazy dog&quot;
-strsplit(pangram, &quot; &quot;)</code></pre>
-<p>The output from strsplit is in a <code>list</code>. Notice that the unusual first line of strsplit()’s output consists of [[1]]. Similar to the way that R displays vectors, [[1]] means that R is showing the first element of a list. Lists are extremely important concepts in R; they allow you to combine all kinds of variables. For example, a list can be made up of many elements, and elements could be vectors, dataframes, or matrices.</p>
-<p>In this example, this list has only a single element. Yes, that’s right: The list has one element, but that element is a vector.</p>
-<p>To extract an element from a list, you have to use double square brackets. Split your pangram into words, and assign the first element to a new variable called words, using double-square-brackets <code>[[]]</code> subsetting, as follows:</p>
-<pre class="r"><code>words &lt;- strsplit(pangram, &quot; &quot;)[[1]]</code></pre>
-<p>We can then pull out the different words using our indexing, where words[1] is the first element in the vector of words and words [9] would be our last:</p>
-<pre class="r"><code>words[2]
-words[9]</code></pre>
-<ol style="list-style-type: decimal">
-<li>Write a function called <code>out</code> that returns a string made up of just the first and last characters of its input. a) Outline the steps you need to take to write this function. Discuss with the person sitting next you. b) Write part of the code, make sure it works. c) Write the next step. d) test your function. e) can your function handle words of different lengths?</li>
-</ol>
-<pre class="r"><code>out &lt;- function(word) {
-    letter  &lt;- strsplit(word, &quot;&quot;)[[1]]
-    abbrev  &lt;- paste(letter[1], letter[length(letter)], sep=&quot;&quot;)
-    abbrev
-}
-
-out('helium')</code></pre>
-<p><strong>Making our function work with different inputs</strong>. If we want just the last word, but we can’t remember how long our sentence is, we can use <code>length()</code></p>
-<pre class="r"><code>length(words)
-words[length(words)]</code></pre>
 <p><strong>BREAK</strong></p>
+</div>
 </div>
 <div id="explaining-the-r-environments" class="section level2">
 <h2>Explaining the R Environments</h2>
-<p>Let’s take a closer look at what happens when we call <code>fahr_to_celsius(32)</code>. To make things clearer, we’ll start by putting the initial value 32 in a variable and store the final result in one as well:</p>
-<pre class="r"><code>original &lt;- 32.0
-final    &lt;- fahr_to_celsius(original)</code></pre>
-<p><em>Discuss and draw a diagram showing what memory looks like after the first line has been executed. Point to the environment</em></p>
-<p>When we call <code>fahr_to_celsius</code>, R doesn’t create the variable temp right away. Instead, it creates a new environment, local to the function, to keep track of the variables defined by <code>fahr_to_kelvin</code>. Initially, the environment only holds the value of temp:</p>
-<p>Your function has its own environment where variables local to that function are stored (<code>temp</code> in this case). Since R is lexically scoped that means that the function’s environment has a parent environment which is defined by where the function is defined, the global environment in this case (if it were defined inside of another function then the parent environment would be the env for that function).</p>
-<p>When we call <code>fahr_to_kelvin</code> inside <code>fahr_to_celsius</code>, R creates another local environment to hold <code>fahr_to_kelvin</code> variables:</p>
-<p>When you call <code>fahr_to_celsius</code> and it calls <code>fahr_to_kelvin</code> then <code>fahr_to_kelvin</code> tries to find the variable <code>temp</code>, it first looks in its own environment, but if it does not find it there, then looks in its parent environment which is the global env.</p>
-<p>It does this because there are now two variables in play called <code>temp</code>: the parameter to <code>fahr_to_celsius</code>, and the parameter to <code>fahr_to_kelvin</code>. Having two variables with the same name in the same part of the program would be ambiguous, so R (and every other modern programming language) creates a new environment for each function call to keep that function’s variables separate from those defined by other functions.</p>
-<p>When the call to <code>fahr_to_kelvi</code>n returns a value, R throws away <code>fahr_to_kelvin</code> stack frame and creates a new variable in the stack frame for <code>fahr_to_celsius</code> to hold the temperature in Kelvin:</p>
-<p>It then calls <code>kelvin_to_celsius</code>, which means it creates an environment to hold that function’s variables:</p>
-<p>Once again, R throws away that stack frame when <code>kelvin_to_celsius</code> is done and creates the variable result in the environment for <code>fahr_to_celsius</code>:</p>
-<p>Finally, when <code>fahr_to_celsius</code> is done, R throws away its environment and puts its result in a new variable called final that lives in the <code>global environment</code> we started with:</p>
-<p>So we need to be really careful when writing functions that we define the correct inputs. For example, if we had not written our function correctly, if <code>fahr_to_kelvin</code> input was <code>temp2</code>, then instead of using the <code>temp</code> input to the function, it would search the global environment for something else that could be defined. In this case, we would get an answer, but it would be the wrong one. If we had correctly assigned it as <code>temp</code>, the value would have been correctly carried through within the function’s environment.</p>
-<p>The summary of this is that the parent environment (global is the parent of <code>fahr_to_celsius</code>, <code>fahr_to_celsius</code> is the parent to <code>fahr_to_kelvin</code>) is the environment where a function was defined (lexical scoping), the parent frame is the frame/environment from which the function was called (simulated dynamic scoping).</p>
-<p>This final environment/stack frame is always there; it holds the variables we defined outside the functions in our code. What it doesn’t hold is the variables that were in the various stack frames. If we try to get the value of temp after our functions have finished running, R tells us that there’s no such thing:</p>
-<pre class="r"><code>paste('final value of temp after all function calls:', temp)</code></pre>
-<p>Why go to all this trouble? Well, here’s a function called <code>range</code> that calculates the difference between the mininum and maximum values in an array:</p>
-<pre class="r"><code>help(range) #or ?range
+<p>Lets go back to the script we were writing before:</p>
+<pre class="r"><code># This script computes the average GDP for Albania using the gapminder data
 
-numbers  &lt;-  1:100
-range(numbers)</code></pre>
-<p>We might very well use a variable with the same name to hold data:</p>
-<pre class="r"><code>numRange  &lt;-  range(numbers)</code></pre>
-<p>Same for the celsius function:</p>
-<pre class="r"><code>hot = 29
-fahr_to_celsius(hot)</code></pre>
-<p>We don’t expect <code>range</code> to have the value 20.0 after this function call, so the name diff cannot refer to the same thing inside span as it does in the main body of our program. And yes, we could probably choose a different name than diff in our main program in this case, but we don’t want to have to read every line of function that we use to see what variable names its functions use before calling any of those functions, just in case they change the values of our variables.</p>
-<p>The big idea here is <strong>encapsulation</strong>, and it’s the key to writing correct, comprehensible programs. A function’s job is to turn several operations into one so that we can think about a single function call instead of a dozen or a hundred statements each time we want to do something. That only works if functions don’t interfere with each other; if they do, we have to pay attention to the details once again, which quickly overloads our short-term memory.</p>
-<div id="challenges-1" class="section level3">
-<h3>Challenges</h3>
-<ol style="list-style-type: decimal">
-<li>We previously wrote functions called <code>fence</code> and <code>out</code>. Walk your neighbor step-by-step through what happens when we call <code>abbrev &lt;- out(fence('carbon', '+'))</code>. Use words or a diagram to explain how the variables change, and how the stack/environment changes. Look at the environment tab in RStudio.</li>
-</ol>
-<p><strong>BREAK</strong></p>
-</div>
-</div>
-</div>
-<div id="testing-and-documenting" class="section level1">
-<h1>Testing and Documenting</h1>
-<p>Once we start putting things in functions so that we can re-use them, we need to start testing that those functions are working correctly. To see how to do this, let’s write a function to center a dataset around a particular value:</p>
-<pre class="r"><code>center &lt;- function(data, desired){
-    new &lt;- (data - mean(data)) + desired
-    new
-}</code></pre>
-<p>We could test this on our actual data, but since we don’t know what the values ought to be, it will be hard to tell if the result was correct. Instead, let’s create a matrix of 0’s and then center that around 3. This will make it simple to see if our function is working:</p>
-<pre class="r"><code>z &lt;- matrix(data = 0, nrow = 2, ncol = 2)
-center(z, 3)</code></pre>
-<p>That looks right, so let’s try center on our real data:</p>
-<pre class="r"><code>center(datamatrix, 0)</code></pre>
-<p>It’s hard to tell from the default output whether the result is correct, but there are a few simple tests that will reassure us:</p>
-<pre class="r"><code>paste('original min, mean, and max are:', min(datamatrix), ',', mean(datamatrix), ',', max(datamatrix))
-centered &lt;- center(datamatrix, 0)
+# generate a platform independent file name for the data
+fileName &lt;- file.path('data', 'gapminder-FiveYearData.csv')
 
-paste('centered min, mean, and max are:', min(centered), ',', mean(centered), ',', max(centered))</code></pre>
-<p>That seems almost right: the original mean was about 6.1, so the lower bound from zero is how about -6.1. The mean of the centered data isn’t quite zero—we’ll explore why not in the challenges—but it’s pretty close. We can even go further and check that the standard deviation hasn’t changed:</p>
-<pre class="r"><code>paste('std dev before and after:', sd(datamatrix), sd(centered))</code></pre>
-<p>Those values look the same, but we probably wouldn’t notice if they were different in the sixth decimal place. Let’s do this instead:</p>
-<pre class="r"><code>paste('difference in standard deviations before and after:', sd(datamatrix) - sd(centered))</code></pre>
-<p>Sometimes, a very small difference can be detected. This could be due to rounding at very low decimal places or it could be a version issue if using different releases of R on different computers. It’s still possible that our function is wrong, but it seems unlikely enough that we should probably get back to doing our analysis. We have one more task first, though: we should write some documentation for our function to remind ourselves later what it’s for and how to use it.</p>
-<p>The usual way to put documentation in software is to add comments like this:</p>
-<pre class="r"><code>#return a new matrix containing the original data centered around the desired value.
-center &lt;- function(data, desired){
-    new &lt;- (data - mean(data)) + desired
-    new
+# read the data file
+gapminder &lt;- read.csv(fileName)
+
+# select the rows where the country is Albania and store it in albaniaData
+albaniaData &lt;- gapminder[gapminder$country == 'Albania',]
+
+# select the column containing the GDP per capita from the Albania data
+albaniaGdp &lt;- albaniaData$gdpPercap
+
+# compute the average GDP value
+albaniaAverageGdp &lt;- mean(albaniaGdp)
+
+# print a message with the result of our computation
+paste('The average GDP of Albania is', albaniaAverageGdp)</code></pre>
+<pre><code>## [1] &quot;The average GDP of Albania is 3255.36663266667&quot;</code></pre>
+<p>And make a small change:</p>
+<pre class="r"><code># This script computes the average GDP for Albania using the gapminder data
+
+# generate a platform independent file name for the data
+fileName &lt;- file.path('data', 'gapminder-FiveYearData.csv')
+
+# read the data file
+gapminder &lt;- read.csv(fileName)
+
+# create a variable to store a country name
+countryName &lt;- 'Algeria'
+
+# select the rows where the country is Albania and store it in albaniaData
+albaniaData &lt;- gapminder[gapminder$country == countryName,]     # note the change here
+
+# select the column containing the GDP per capita from the Albania data
+albaniaGdp &lt;- albaniaData$gdpPercap
+
+# compute the average GDP value
+albaniaAverageGdp &lt;- mean(albaniaGdp)
+
+# print a message with the result of our computation
+paste('The average GDP of', countryName, 'is', albaniaAverageGdp) # and the change here</code></pre>
+<pre><code>## [1] &quot;The average GDP of Algeria is 4426.02597316667&quot;</code></pre>
+<p>Would using country instead of countryName cause any conflict with gapminder$country? No.</p>
+<p>In a new script file, write a function <code>getAverageGdpPerCapita</code> that takes the name of a country and the gapminder dataset as its two inputs, then computes the averaged GDP per capita and returns it.</p>
+<pre class="r"><code># This script computes the average GDP for a country using the gapminder data
+
+# clear old variables
+rm(list=ls())
+
+# generate a platform independent file name for the data
+fileName &lt;- file.path('data', 'gapminder-FiveYearData.csv')
+
+# read the data file
+gapminder &lt;- read.csv(fileName)</code></pre>
+<pre class="r"><code>getAverageGdpPerCapita &lt;- function(country, gapminder) {
+  # extract gdpPercap from the gapminder data for the specified country.
+  
+  selectedCountryData &lt;- gapminder[gapminder$country == country, 'gdpPercap']
+  
+  mean(selectedCountryData)
 }</code></pre>
-<p>There’s a better way, though. If we make our notes outside the function, we may not be able to find them quickly when we need them. If we put the notes inside the funciton, then simply typing in the function will give us the notes along with all of the text, so we can remember what we told the computer to do. In other languages, docstrings show up as help, even for functions that you wrote yourself.</p>
-<pre class="r"><code>center &lt;- function(data, desired){
-    #return a new matrix containing the original data centered around the desired value.
-    new &lt;- (data - mean(data)) + desired
-    new
-}</code></pre>
-<p>This is better because we can now view our function and our message anytime:</p>
-<pre class="r"><code>center</code></pre>
-<div id="challenges-2" class="section level3">
-<h3>Challenges</h3>
-<p>This next challenge has several steps. Think about how you break down a difficult problem into manageable pieces.</p>
-<ol style="list-style-type: decimal">
-<li>Write a function called <code>analyze</code> that takes a filename as a parameter and displays the 3 graphs you made earlier (average, min and max inflammation over time). i.e., <code>analyze('data/inflammation-01.csv')</code> should produce the graphs already shown, while <code>analyze('inflammation-02.csv')</code> should produce corresponding graphs for the second data set. Be sure to give your function a docstring.</li>
-</ol>
-</div>
-<div id="defining-defaults" class="section level2">
-<h2>Defining Defaults</h2>
-<p>We have passed parameters to functions in two ways: directly, as in <code>dim(matrixdata)</code>, and by name, as in <code>matrix(data = 0, nrow = 2, ncol = 2)</code>. In fact, we can pass the filename to loadtxt without the <code>nrow=</code>:</p>
-<pre class="r"><code>matrix(0,2,2)</code></pre>
-<p>To understand what’s going on, and make our own functions easier to use, let’s re-define our center function like this:</p>
-<pre class="r"><code>center &lt;- function(data, desired=0){
-    #return a new matrix containing the original data centered around the desired value.
-    new &lt;- (data - mean(data)) + desired
-    new
-}</code></pre>
-<p>The key change is that the second parameter is now written <code>desired=0</code> instead of just <code>desired</code>. If we call the function with two arguments, it works as it did before:</p>
-<pre class="r"><code>test_data &lt;- matrix(0,2,2)
-center(test_data, 3)</code></pre>
-<p>But we can also now call it with just one parameter, in which case desired is automatically assigned the default value of 0.0:</p>
-<pre class="r"><code>more_data &lt;- matrix(0, 2, 2) + 5
-more_data
-center(more_data)</code></pre>
-<p>This is handy: if we usually want a function to work one way, but occasionally need it to do something else, we can allow people to pass a parameter when they need to but provide a default to make the normal case easier. The example below shows how R matches values to parameters:</p>
-<pre class="r"><code>display &lt;- function(a=1, b=2, c=3) {
-    paste('a:', a, 'b:', b, 'c:', c)
+<p>Try out our new function</p>
+<pre class="r"><code>gdpUSA &lt;- getAverageGdpPerCapita('United States', gapminder)
+gdpCanada &lt;- getAverageGdpPerCapita('Canada', gapminder)
+gdpMexico &lt;- getAverageGdpPerCapita('Mexico', gapminder)</code></pre>
+<p>What will happen if we remove the second argument to the function? Will it throw an error?</p>
+<pre class="r"><code>getAverageGdpPerCapita &lt;- function(country) {
+  # extract gdpPercap from the gapminder data for the specified country.
+  
+  selectedCountryData &lt;- gapminder[gapminder$country == country, 'gdpPercap']
+  
+  mean(selectedCountryData)
 }
-        
-paste('no parameters:', display())
-paste('one parameter:', display(55))
-paste('two parameters:', display(55, 66))
-paste('three parameters:', display (55, 66, 77))</code></pre>
-<p>As this example shows, parameters are matched up from left to right, and any that haven’t been given a value explicitly get their default value. We can override this behavior by naming the value as we pass it in:</p>
-<pre class="r"><code>paste('only setting the value of c', display(c=77))</code></pre>
-<p>With that in hand, let’s look at the help for <code>read.csv</code>:</p>
-<pre class="r"><code>help(read.csv) #or ?read.csv</code></pre>
-<p><em>walk through the help file, point out important items. How to read the defaults, how to know what you need to specify. Definitions and examples…</em></p>
-<p>There’s a lot of information here, but the most important part is the first couple of lines:</p>
-<pre class="r"><code>read.csv(file, header = TRUE, sep = &quot;,&quot;, quote = &quot;\&quot;&quot;,
+
+gdpUSA &lt;- getAverageGdpPerCapita('United States')
+gdpCanada &lt;- getAverageGdpPerCapita('Canada')
+gdpMexico &lt;- getAverageGdpPerCapita('Mexico')
+
+paste('GDP of USA is', gdpUSA);</code></pre>
+<pre><code>## [1] &quot;GDP of USA is 26261.1513466667&quot;</code></pre>
+<p>When we create new variables, they are created in the current frame, which is initially the global frame:</p>
+<pre class="r"><code>search()</code></pre>
+<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;package:knitr&quot;     &quot;package:stats&quot;    
+##  [4] &quot;package:graphics&quot;  &quot;package:grDevices&quot; &quot;package:utils&quot;    
+##  [7] &quot;package:datasets&quot;  &quot;package:methods&quot;   &quot;Autoloads&quot;        
+## [10] &quot;package:base&quot;</code></pre>
+<p>When we access a variable, those variables are also searched for in the current frame.</p>
+<p>When a function is called, R searches for variables that are arguments to the function and any new variables that are created in the function. If a variable cannot be found, it searched for in its parent frame. The parent frame is the frame where it is defined, and not where it is called.</p>
+</div>
+<div id="default-values" class="section level2">
+<h2>Default values</h2>
+</div>
+<div id="challenge-3" class="section level2">
+<h2>Challenge</h2>
+<p>Modify the function getAverageGdpPerCapita that accepts 3 arguments, a country name, a start year, and an end year. The function should compute the average gdp of that country between the range of years supplied. Use the logical <code>&amp;</code> operator to combine the multiple conditions required. Or you can apply the three conditions one afer the other.</p>
+<pre><code>getAverageGdpPerCapita &lt;- function(country, startYear, endYear) {
+  # extract gdpPercap from the gapminder data for the specified country.
+  
+  selectedCountryData &lt;- gapminder[gapminder$country == country &amp; 
+                                     gapminder$year &gt;= startYear &amp; 
+                                     gapminder$year &lt;= endYear, 'gdpPercap']
+  
+  mean(selectedCountryData)
+}
+
+gdpUSA &lt;- getAverageGdpPerCapita('United States', 1980, 1989)
+gdpCanada &lt;- getAverageGdpPerCapita('Canada')
+
+paste('GDP of USA is', gdpUSA)
+paste('GDP of Canada is', gdpCanada)</code></pre>
+<p>Let’s say that if start and end year are not specified, we want to default to a start year of 1952 and an end year of 2007.</p>
+<pre class="r"><code>getAverageGdpPerCapita &lt;- function(country, startYear = 1952, endYear = 2007) {
+  # extract gdpPercap from the gapminder data for the specified country.
+  
+  selectedCountryData &lt;- gapminder[gapminder$country == country &amp; 
+                                     gapminder$year &gt;= startYear &amp; 
+                                     gapminder$year &lt;= endYear, 'gdpPercap']
+  
+  mean(selectedCountryData)
+}
+
+gdpUSA &lt;- getAverageGdpPerCapita('United States', 1980, 1989)
+gdpCanada &lt;- getAverageGdpPerCapita('Canada')
+
+paste('GDP of USA is', gdpUSA)</code></pre>
+<pre><code>## [1] &quot;GDP of USA is 27446.954775&quot;</code></pre>
+<pre class="r"><code>paste('GDP of Canada is', gdpCanada)</code></pre>
+<pre><code>## [1] &quot;GDP of Canada is 22410.74634&quot;</code></pre>
+<p>Note the use of an = sign instead of the arrow <code>&lt;-</code>.</p>
+<p>Show the documentation of the read.csv function.</p>
+<pre><code>read.csv(file, header = TRUE, sep = &quot;,&quot;, quote = &quot;\&quot;&quot;,
          dec = &quot;.&quot;, fill = TRUE, comment.char = &quot;&quot;, ...)</code></pre>
-<p>This tells us that <code>read.csv</code> has one parameter called file that doesn’t have a default value, and eight others that do. If we call the function like this:</p>
-<pre class="r"><code>read.csv(fileName)</code></pre>
-<p>then the filename is assigned to name (which is what we want), but the delimiter string ‘,’ is assigned to <code>header</code> rather than <code>sep</code>, because <code>header</code> is the second parameter in the list. That’s why we don’t have to provide <code>file=</code> for the filename, but do have to provide <code>sep=</code> for the second parameter.</p>
-<div id="challenges-3" class="section level3">
-<h3>Challenges</h3>
-<p>Rewrite the normalize function so that it scales data to lie between 0.0 and 1.0 by default, but will allow the caller to specify lower and upper bounds if they want. Compare your implementation to your neighbor’s: do the two functions always behave the same way?</p>
+<p>That is why</p>
+<pre><code>file &lt;- 'myfile.cs'
+read.csv(file)</code></pre>
+<p>works.</p>
+<p>What if we switch the start and end years?</p>
+<pre><code>gdpUSA &lt;- getAverageGdpPerCapita('United States', 1989, 1980)</code></pre>
+<p>It won’t work, as R matches the arguments by position. But, we can specify arguments by name as</p>
+<pre><code>gdpUSA &lt;- getAverageGdpPerCapita('United States', endYear = 1989, startYear = 1980)</code></pre>
+<p>We can even say</p>
+<pre><code>gdpUSA &lt;- getAverageGdpPerCapita('United States', endYear = 1989)</code></pre>
+<p>in which case the start year will take on its default value.</p>
 </div>
+<div id="processing-large-vectors-using-the-apply-functions" class="section level2">
+<h2>Processing large vectors using the <code>apply</code> functions</h2>
+<p>In our later sessions, we are going to see control statements like loops. One of their uses is to go through an array and do a task on its elements one by one. Without getting into loops, we will quickly demonstrate the <code>apply</code> family of functions which let us achieve something similar:</p>
+<pre class="r"><code>southAmericanCountries &lt;- c('Argentina', 'Bolivia', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Paraguay', 'Peru', 'Uruguay', 'Venezuela')
+
+# use sapply to invoke getAverageGdpPerCapita() on all elements of southAmericanCountries
+averagedGdpSouthAmericanCountries &lt;- sapply(southAmericanCountries, getAverageGdpPerCapita)
+
+# sort them in ascending order
+averagedGdpSouthAmericanCountries &lt;- averagedGdpSouthAmericanCountries[order(averagedGdpSouthAmericanCountries)]
+
+barplot(averagedGdpSouthAmericanCountries, las=2)</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3deYBU1Zmw8ZeloWlBRIhoRBRwA40LalziuKExDiaKRPwg7tG4oDGiuEQjE8WAaMQvmWhEo5loXJK4RDTMuMUlMRH9NKiJUUQygIorIm5sfb9ae6vSPv32ec+pqvv8/rCrTkOdavv2Q9Xte8+VBACgIrGfAABUKwIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACg5BjQ2Td92OLe0ycMq19/5+nLOjsCANXMLaBvdpPFzfcu7So5g5/u3AgAVDW3gP5YWgT0mkwFD5oyaTORgYs7MwIA1c0poM81tAjo0l7SfXbm48rDRSZ0YgQAqly7AW1cNOfb9dIioOeJnJ+7sWKQdF2gHwGAKtduQA/K77lsCmjj5iLz8zfPFpmpHgGQNit+eK6JKctjfUXtBnRUm4C+IjK8cPNRkQPVIwDS5mYxckOsr6jdgL7/dsa+zQG9W+SMws3VDTJIPQIgbW6QrU40MFx+Husrcvst/IHNAZ0h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" title alt width="672" /></p>
 </div>
-</div>
-<div id="key-points" class="section level1">
-<h1>Key Points</h1>
+<div id="key-points" class="section level2">
+<h2>Key Points</h2>
 <ul>
 <li>Define a function using <code>function</code> name(…params…).</li>
 <li>The body of a function should be indented.</li>
@@ -365,25 +754,47 @@ paste('three parameters:', display (55, 66, 77))</code></pre>
 <li>Specify default values for parameters when defining a function using name=value in the parameter list.</li>
 <li>Parameters can be passed by matching based on name, by position, or by omitting them (in which case the default value is used).</li>
 </ul>
-<div id="next-steps" class="section level2">
-<h2>Next Steps</h2>
-<p>We now have a function called analyze to visualize a single data set. We could use it to explore all 12 of our current data sets like this:</p>
-<pre class="r"><code>analyze('data/inflammation-01.csv')
-analyze('data/inflammation-02.csv')
-#...
-analyze('data/inflammation-12.csv')</code></pre>
-<p>but the chances of us typing all 12 filenames correctly aren’t great, and we’ll be even worse off if we get another hundred files. What we need is a way to tell R to do something once for each file, and that will be the subject of the next lesson.</p>
+<hr />
 </div>
-</div>
-<div id="scope-issues-in-functions-missing-arguments" class="section level1">
-<h1>Scope issues in functions, Missing arguments</h1>
 </div>
 <div id="calling-r-scripts-from-the-command-line" class="section level1">
 <h1>Calling R scripts from the command line</h1>
-<p>`Rscript filename.R arguments</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="data:image/png;base64,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" title alt width="672" /></p>
-<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
+<p>Just like we can call other scripts and functions from our R programs, we can call an R script from the command line. We use the Rscript program to do this.</p>
+<p><code>Rscript filename.R</code></p>
+<p>If Rscript is not on your system’s path, you can invoke Rscript using it’s full path name.</p>
+<p>Try it out:</p>
+<p>script.R:</p>
+<pre><code>print('This is a simple R script')</code></pre>
+<p>On the command line:</p>
+<pre><code>Rscript filename.R</code></pre>
+<p>Even if you do your data analysis in a different programming language, you can still use R’s plotting capabilities (which we will learn more about in the afternoon session). So if the majority of your work is in another programming language, you can still make use of R to do parts of the analysis, or only to make publication quality plots.</p>
+<p>We will write a script that will produce a barplot from a given datafile. In the previous example, script.R prints a fixed message and has no way of getting any information from the shell. Rscript allows you to send arguments to the R script by specifying them after the file name:</p>
+<pre><code>Rscript filename.R argument_1 argument_2 ...</code></pre>
+<p>These arguments can be accesed from within the R script by using the <code>commandArgs()</code> function. By default the list will include the name of the R executable, the script file name, and several switches. Using <code>commandArgs(FALSE)</code> only presents us with the arguments starting from <code>argument_1</code> onwards.</p>
+<p>Updated script.R</p>
+<pre><code>countyList &lt;- commandArgs(TRUE)
+
+dataDir &lt;- 'data'
+dataFile &lt;- 'gapminder-FiveYearData.csv'
+fileName &lt;- file.path(dataDir, dataFile)
+gapminder &lt;- read.csv(fileName)
+
+getAverageGdpPerCapita &lt;- function(country) {
+  # extract gdpPercap from the gapminder data for the specified country.
+  
+  selectedCountryData &lt;- gapminder[gapminder$country == country, 'gdpPercap']
+  
+  mean(selectedCountryData)
+}
+
+averagedGdp &lt;- sapply(countyList, getAverageGdpPerCapita)
+barplot(averagedGdp)
+
+print(averagedGdp)</code></pre>
+<p>We now write a shell script that is going to call this method on a list of countries</p>
+<pre><code>countries=&quot;Canada Belgium&quot;
+Rscript cmdScript.R $countries</code></pre>
+<p>The generated plots are saved in PDF format in the file Rplots.pdf.</p>
 </div>
 
 
